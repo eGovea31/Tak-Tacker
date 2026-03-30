@@ -28,6 +28,13 @@ function saveTasks(tasks){
     fs.writeFileSync("tasks.json",JSON.stringify(tasks,null,2))
 }
 
+// -------------Eliminate Task--------------
+function eliminateTasks(tasks, id){
+    //tareas= tareas.filter(t => t.id !== id)
+    return tasks.filter( t => t.id !== id)
+}
+
+
 const args = process.argv // save arguments
 
 const command = args[2] // extract command 
@@ -45,8 +52,39 @@ if(command === "add"){
     saveTasks(tasks)
 
     console.log("Tarea agregada: ", newTask)
-} else {
-    console.log("Unrecognized Command ")
+} 
+
+//------------- List Tasks --------------
+else if(command ==="list") {
+    const tasks = loadTasks()
+    
+    if( tasks.length === 0){
+        console.log("No hay tareas")
+    } else {
+        tasks.forEach( task => {
+            console.log(task.id + " - " + task.description)
+        })
+    }
 }
 
-//const tasks=[]
+//------------- Delete task-----------
+
+else if( command === "delete") {
+    const tasks= loadTasks()
+
+    if(tasks.length === 0){
+        console.log("No hay tareas para eliminar")
+    }else {
+        const id = Number(input)
+        
+        const updatedTasks =  eliminateTasks(tasks, id)
+
+        if( tasks.length === updatedTasks.length){
+            console.log("No se encontr'o esta tarea")
+        }else {
+            saveTasks(updatedTasks)
+            console.log("Tarea eliminada correctamente")
+        }
+    }
+
+}
