@@ -1,18 +1,9 @@
 [
   {
-    "id": 1,
-    "description": "Aprender backend"
-  },
-  {
     "id": 2,
-    "description": "Salir a correr"
-  },
-  {
-    "id": 3,
-    "description": "ir al gimnasio"
-  },
-  {
-    "id": 4,
-    "description": "tocar guitarra"
+    "description": "tocar guitarra",
+    "status": "pending",
+    "createAt": "2026-03-30T19:43:29.104Z",
+    "updatedAt": "2026-03-30T19:43:29.105Z"
   }
 ]

@@ -1,52 +1,12 @@
-/*
-INPUT
-  ↓
-interpretar comando
-  ↓
-leer datos existentes
-  ↓
-modificar datos
-  ↓
-guardar datos
-  ↓
-OUTPUT
-*/
-const fs= require("fs")
-
-//***************** FUNCTIONS ********************************
-
-// ------------Read Tasks-------------
-function loadTasks(){
-    try{
-        const data= fs.readFileSync("tasks.json","utf-8")
-        return JSON.parse(data)
-    } catch(error){
-        return[]
-    }
-}
-
-//------------Save tasks------------------
-function saveTasks(tasks){
-    fs.writeFileSync("tasks.json",JSON.stringify(tasks,null,2))
-}
-
-// -------------Eliminate Task--------------
-function eliminateTasks(tasks, id){
-    //tareas= tareas.filter(t => t.id !== id)
-    return tasks.filter( t => t.id !== id)
-}
-
-function updateTask( tasks, id, newDescription){
-    let found = false
-
-    for(let i=0; i < tasks.length; i++){
-        if(tasks[i].id ===id){
-            tasks[i].description = newDescription
-            found = true
-        }
-    }
-    return{ tasks,found}
-}
+//CONTROLLER
+//Entrada (CLI) - Recibe comandos del usuario
+const {
+    addTasks,
+    eliminateTasks,
+    updateTasks,
+    updateStatus,
+    listTasks
+} = require("./tasks")
 
 
 const args = process.argv // save arguments
@@ -58,77 +18,96 @@ const input = args[3] //
 
 
 //******************************* COMMANDS *********************************
+
+//---------------ADD--------------------
 if(command === "add"){
-    const tasks = loadTasks()
-
-    const newTask = {
-        id: tasks.length+1,
-        description: input
-    }
-
-    tasks.push(newTask)
-    saveTasks(tasks)
-
-    console.log("Tarea agregada: ", newTask)
+   const task= addTasks(input)
+    console.log("Tarea agregada: ", task)
 } 
 
-//------------- List Tasks --------------
+//------------- List  --------------
 else if(command ==="list") {
-    const tasks = loadTasks()
-    
+    const filter = args[3]
+    const tasks = listTasks(filter)
+
     if( tasks.length === 0){
         console.log("No hay tareas")
     } else {
         tasks.forEach( task => {
-            console.log(task.id + " - " + task.description)
+            console.log(task.id + " - " + task.description + "["+ task.status +"]")
         })
     }
 }
 
-//------------- Delete task-----------
+//------------- Delete -----------
 
 else if( command === "delete") {
-    const tasks= loadTasks()
 
-    if(tasks.length === 0){
-        console.log("No hay tareas para eliminar")
-    }else {
         const id = Number(input)
-        
-        const updatedTasks =  eliminateTasks(tasks, id)
+    
+        const success= eliminateTasks(id) 
 
-        if( tasks.length === updatedTasks.length){
+        if(!success){
+            console.log("No se encontr'o la tarea")
+        }else {
+            console.log("Tarea eliminada")
+        }
+        
+       /* if( tasks.length === updatedTasks.length){
             console.log("No se encontr'o esta tarea")
         }else {
             saveTasks(updatedTasks)
             console.log("Tarea eliminada correctamente")
-        }
-    }
+        }*/
+    
 
 }
 
-// -------------- Update Tasks-------------------------
-else if( command === "update"){
-    const tasks= loadTasks()
+// -------------- Update -------------------------
+else if (command === "update") {
+    const id = Number(input);
+    const newDescription = args[4];
 
-     if (tasks.length === 0) {
-        console.log("No hay tareas para actualizar");
-    } else {
-        const id = Number(input)
-        const newDescription = args[4]
-
-        if (!newDescription) {
-            console.log("Debes proporcionar una nueva descripción");
-            return;
-        }
-
-        const result = updateTask(tasks,id,newDescription)
-
-        if(!result.found){
-            console.log("No se encontr'o la tarea")
-        }else {
-            saveTasks(result.tasks)
-            console.log("Tarea actualizada correctamente")
-        }
+    if (!newDescription) {
+        console.log("Debes proporcionar una nueva descripción");
+        return;
     }
+
+    const success = updateTasks(id, newDescription);
+
+    if (!success) {
+        console.log("No se encontró la tarea");
+    } else {
+        console.log("Tarea actualizada correctamente");
+    }
+}
+
+//-------------Mark-In-Progress----------------
+else if(command === "mark-in-progress"){
+    
+    const id = Number(input)
+
+    const success= updateStatus(id,"in-progress")
+      if (!success) {
+        console.log("No se encontró la tarea");
+    } else {
+        console.log("Tarea marcada como en progreso");
+    }
+}
+
+// ----------------- Mark-Done-----------------
+else if (command === "mark-done") {
+    
+    const id = Number(input);
+
+    const success = updateStatus( id, "done");
+
+    if (!success) {
+        console.log("No se encontró la tarea");
+    } else {
+        console.log("Tarea marcada como completada");
+    }
+}
+else{
+    console.log("Comando no reconocido")
 }
