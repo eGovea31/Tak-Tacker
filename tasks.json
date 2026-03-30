@@ -2,5 +2,17 @@
   {
     "id": 1,
     "description": "Aprender backend"
+  },
+  {
+    "id": 2,
+    "description": "Salir a correr"
+  },
+  {
+    "id": 3,
+    "description": "ir al gimnasio"
+  },
+  {
+    "id": 4,
+    "description": "tocar guitarra"
   }
 ]

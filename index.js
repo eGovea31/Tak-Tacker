@@ -13,6 +13,8 @@ OUTPUT
 */
 const fs= require("fs")
 
+//***************** FUNCTIONS ********************************
+
 // ------------Read Tasks-------------
 function loadTasks(){
     try{
@@ -34,12 +36,28 @@ function eliminateTasks(tasks, id){
     return tasks.filter( t => t.id !== id)
 }
 
+function updateTask( tasks, id, newDescription){
+    let found = false
+
+    for(let i=0; i < tasks.length; i++){
+        if(tasks[i].id ===id){
+            tasks[i].description = newDescription
+            found = true
+        }
+    }
+    return{ tasks,found}
+}
+
 
 const args = process.argv // save arguments
 
 const command = args[2] // extract command 
 const input = args[3] // 
 
+
+
+
+//******************************* COMMANDS *********************************
 if(command === "add"){
     const tasks = loadTasks()
 
@@ -87,4 +105,30 @@ else if( command === "delete") {
         }
     }
 
+}
+
+// -------------- Update Tasks-------------------------
+else if( command === "update"){
+    const tasks= loadTasks()
+
+     if (tasks.length === 0) {
+        console.log("No hay tareas para actualizar");
+    } else {
+        const id = Number(input)
+        const newDescription = args[4]
+
+        if (!newDescription) {
+            console.log("Debes proporcionar una nueva descripción");
+            return;
+        }
+
+        const result = updateTask(tasks,id,newDescription)
+
+        if(!result.found){
+            console.log("No se encontr'o la tarea")
+        }else {
+            saveTasks(result.tasks)
+            console.log("Tarea actualizada correctamente")
+        }
+    }
 }
